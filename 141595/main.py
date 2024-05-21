@@ -2,55 +2,56 @@ from pygame import *
 from random import randint
 win_width = 700
 win_height = 500
-lost = 0
 score = 0
 
+xD = 100
+Y = 100
+
+
+font.init()
+font2 =  font.Font(None, 50)
+
 class GameSprite(sprite.Sprite):
-    #конструктор класса
     def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
         super().__init__()
-        # каждый спрайт должен хранить свойство image - изображение
         self.image = transform.scale(image.load(player_image), (size_x, size_y))
         self.speed = player_speed
-        # каждый спрайт должен хранить свойство rect - прямоугольник, в который он вписан
         self.rect = self.image.get_rect()
         self.rect.x = player_x
         self.rect.y = player_y
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
-back =(200, 255, 255)
-win_width = 600
+back = transform.scale(image.load("pppppppppppppp.jpg"), (win_width, win_height))
+win_width = 700
 win_height = 500
 window = display.set_mode((win_width, win_height))
-window.fill(back)
+
 
 game = True
 finish = False
 clock = time.Clock()
 FPS = 60
 
-
-
 class Player(GameSprite):
-    def update_r(self):
-        keys = key.get_pressed()
-       if keys[K_UP] and self.rect.y > 5:
-           self.rect.y -= self.speed
-       if keys[K_DOWN] and self.rect.y < win_height - 80:
-           self.rect.y += self.speed
     def update(self):
         keys = key.get_pressed()
-       if keys[K_w] and self.rect.y > 5:
+        if keys[K_w] and self.rect.y > 5:
            self.rect.y -= self.speed
-       if keys[K_s] and self.rect.y < win_height - 80:
+        if keys[K_s] and self.rect.y < win_height - 80:
            self.rect.y += self.speed
-    def fire(self):
-        bullet = Bullet('bullet.png', self.rect.centerx, self.rect.top, 15, 20, -15)
-        bullets.add(bullet)
-
-
-
+    def set_size(self, player_image, size_y, size_x):
+        self.image = transform.scale(image.load(player_image), (size_x, size_y))
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y
+    def update_r(self):
+        keys = key.get_pressed()
+        if keys[K_UP] and self.rect.y > 5:
+           self.rect.y -= self.speed
+        if keys[K_DOWN] and self.rect.y < win_height - 80:
+           self.rect.y += self.speed
+    
 
 class Enemy(GameSprite):
     def update(self):
@@ -62,5 +63,36 @@ class Enemy(GameSprite):
             self.speed = randint(1, 2)
             lost = lost + 1
 
+poketka = Player('pixil-frame-03.png', 25, 250, 100, 100, 5)
+poketka1 = Player('pixil-frame-04.png', 600, 250, 100, 100, 5)
+ball = GameSprite('pixil-frame-0.png', 350, 250, 50, 50, 5 )
+m_x = -4
+m_y = 2
+while game:
+    if score%15==0:
+        xD -= 7*(score//15)
+        Y -= 7*(score//15)
+    poketka.set_size('pixil-frame-03.png', xD, Y)
+    poketka1.set_size('pixil-frame-04.png', xD, Y)
+    window.blit(back,(0, 0))
+    poketka.reset()
+    poketka1.reset()
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+    if not finish:       
+        poketka.update()
+        poketka1.update_r()
+        ball.rect.x += m_x
+        ball.rect.y += m_y
+    if sprite.collide_rect(ball,poketka) or sprite.collide_rect(ball,poketka1):
+        score+=1
+        m_x*=-1
+        ball.rect.x += m_x*5
+    if ball.rect.y <= 5 or ball.rect.y >= 450:
+        m_y *= -1
+    text = font2.render('Счёт:' + str(score), 1,(0, 255, 0))
+    window.blit(text, (10, 20))
+    ball.reset()
     display.update()
     clock.tick(FPS)
