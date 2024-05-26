@@ -40,11 +40,11 @@ class Player(GameSprite):
            self.rect.y -= self.speed
         if keys[K_s] and self.rect.y < win_height - 80:
            self.rect.y += self.speed
-    def set_size(self, player_image, size_y, size_x):
-        self.image = transform.scale(image.load(player_image), (size_x, size_y))
+    def set_size(self, player_image,player_x, player_y, x, y):
+        self.image = transform.scale(image.load(player_image), (player_x, player_y))
         self.rect = self.image.get_rect()
-        self.rect.x = player_x
-        self.rect.y = player_y
+        self.rect.x = x
+        self.rect.y = y
     def update_r(self):
         keys = key.get_pressed()
         if keys[K_UP] and self.rect.y > 5:
@@ -63,36 +63,94 @@ class Enemy(GameSprite):
             self.speed = randint(1, 2)
             lost = lost + 1
 
-poketka = Player('pixil-frame-03.png', 25, 250, 100, 100, 5)
+poketka = Player('pixil-frame-03.png', 50, 250, 100, 100, 5)
 poketka1 = Player('pixil-frame-04.png', 600, 250, 100, 100, 5)
 ball = GameSprite('pixil-frame-0.png', 350, 250, 50, 50, 5 )
+lose1 = GameSprite('pixil-frame-02.png', 350, 250, 200, 200, 0 )
+lose2 = GameSprite('pixil-frame-01.png', 350, 250, 200, 200, 0 )
 m_x = -4
 m_y = 2
 while game:
-    if score%15==0:
-        xD -= 7*(score//15)
-        Y -= 7*(score//15)
-    poketka.set_size('pixil-frame-03.png', xD, Y)
-    poketka1.set_size('pixil-frame-04.png', xD, Y)
-    window.blit(back,(0, 0))
-    poketka.reset()
-    poketka1.reset()
+    if score > 15 and score < 30:
+        if m_x >=0 :
+            m_x+=0.005
+        else:
+            m_x-=0.01
+    if score > 30 and score < 45:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 45 and score < 60:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 60 and score < 75:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 75 and score < 90:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 90 and score < 105:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 105 and score < 120:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 120 and score < 135:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 135 and score < 150:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01
+    if score > 150 and score < 555:
+        if m_x >=0 :
+            m_x+=0.01
+        else:
+            m_x-=0.01        
     for e in event.get():
         if e.type == QUIT:
             game = False
-    if not finish:       
+    if not finish:
+        window.blit(back,(0, 0))
+        text = font2.render('Счёт:' + str(score), 1,(0, 255, 0))
+        window.blit(text, (10, 20))    
         poketka.update()
         poketka1.update_r()
         ball.rect.x += m_x
         ball.rect.y += m_y
-    if sprite.collide_rect(ball,poketka) or sprite.collide_rect(ball,poketka1):
-        score+=1
-        m_x*=-1
-        ball.rect.x += m_x*5
-    if ball.rect.y <= 5 or ball.rect.y >= 450:
-        m_y *= -1
-    text = font2.render('Счёт:' + str(score), 1,(0, 255, 0))
-    window.blit(text, (10, 20))
-    ball.reset()
+        
+        ball.reset()
+        
+        poketka.reset()
+        poketka1.reset()
+        display.update()
+        if sprite.collide_rect(ball,poketka) or sprite.collide_rect(ball,poketka1):
+            score+=1
+            m_x*=-1
+            ball.rect.x += m_x*5
+        if ball.rect.y <= 5 or ball.rect.y >= 450:
+            m_y *= -1
+        
+    if ball.rect.x <= 0:
+        lose1.reset()
+        finish =True
+    if ball.rect.x >= 700:
+        lose2.reset()
+        finish = True  
     display.update()
+   
     clock.tick(FPS)
